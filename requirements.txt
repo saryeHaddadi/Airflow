@@ -3,9 +3,9 @@
 # pip uninstall library
 
 
-python -m pip install --upgrade pip
+py -m pip install --upgrade pip
 pip install 'apache-airflow==2.0.2' \
- --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.0.2/constraints-3.6.txt"
+ --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.0.2/constraints-3.7.txt"
 
 # airflow
 

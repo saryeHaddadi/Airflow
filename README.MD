@@ -8,4 +8,5 @@ Commands
 > docker-compose up
 > docker ps
 
-Access the webserver: http://localhost:8080
+- Airflow webserver (admin/admin): http://kube-sarye-worker.francecentral.cloudapp.azure.com:8080
+- Hue (admin/admin): http://kube-sarye-worker.francecentral.cloudapp.azure.com:32762

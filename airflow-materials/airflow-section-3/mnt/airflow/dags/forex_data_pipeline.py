@@ -2,6 +2,7 @@ from airflow import DAG
 from airflow.providers.http.sensors.http import HttpSensor
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 
 from datetime import datetime, timedelta
 
@@ -21,7 +22,7 @@ with DAG(dag_id= "forex_data_pipeline",
          catchup= False,
          default_args= tasks_default_args) as dag:
     
-    is_forex_rates_available= HttpSensor (
+    is_forex_rates_available = HttpSensor (
         task_id= "is_forex_rates_available",
         http_conn_id= "forex_api",
         endpoint= "marclamberti/f45f872dea4dfd3eaa015a4a1af4b39b",
@@ -30,7 +31,7 @@ with DAG(dag_id= "forex_data_pipeline",
         timeout= 20 # After 20sec of unsuccess, the task fails
     )
 
-    is_forex_currencies_file_available= FileSensor (
+    is_forex_currencies_file_available = FileSensor (
         task_id= "is_forex_currencies_file_available",
         fs_conn_id= "forex_path",
         filepath= "forex_currencies.csv",
@@ -38,10 +39,19 @@ with DAG(dag_id= "forex_data_pipeline",
         timeout= 20
     )
 
-    downloading_rates= PythonOperator(
+    downloading_rates = PythonOperator(
         task_id= "downloading_rates",
         python_callable= download_rates
     )
+
+    saving_rates = BashOperator(
+        task_id= "saving_rates",
+        bash_command= """
+            hdfs dfs -mkdir -p /forex && \
+            hdfs dfs -put -f $AIRFLOW_HOME/dags/files/forex_rates.json /forex
+        """
+    )
+
 
 
 

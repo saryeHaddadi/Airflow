@@ -22,3 +22,10 @@ def download_rates():
             with open('/opt/airflow/dags/files/forex_rates.json', 'a') as outfile:
                 json.dump(outdata, outfile)
                 outfile.write('\n')
+
+def get_slack_notification():
+    return "Hi from forex_data_pipeline"
+
+
+
+

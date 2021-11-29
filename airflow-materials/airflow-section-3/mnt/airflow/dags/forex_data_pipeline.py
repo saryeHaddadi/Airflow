@@ -59,6 +59,7 @@ with DAG(dag_id= "forex_data_pipeline",
         task_id="creating_forex_rates_table",
         hive_cli_conn_id="hive_conn",
         hql="""
+            DROP TABLE IF EXISTS forex_rates;
             CREATE EXTERNAL TABLE IF NOT EXISTS forex_rates(
                 base STRING,
                 last_update DATE,

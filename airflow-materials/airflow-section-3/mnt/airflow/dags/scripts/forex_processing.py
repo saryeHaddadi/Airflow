@@ -23,3 +23,4 @@ forex_rates = df.select('base', 'last_update', 'rates.eur', 'rates.usd', 'rates.
 
 # Export the dataframe into the Hive table forex_rates
 forex_rates.write.mode("append").insertInto("forex_rates")
+

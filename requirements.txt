@@ -7,6 +7,12 @@ py -m pip install --upgrade pip
 pip install 'apache-airflow==2.0.2' \
  --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.0.2/constraints-3.7.txt"
 
+# sudo apt-get install libsasl2-dev
+pip install apache-airflow-providers-apache-hive
+pip install apache-airflow-providers-apache-spark
+
+
+
 # airflow
 
 # boto3

@@ -3,7 +3,8 @@ from airflow.providers.http.sensors.http import HttpSensor
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
-
+from airflow.providers.apache.hive.operators.hive import HiveOperator
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime, timedelta
 
 from scripts.forex_download import download_rates
@@ -22,7 +23,7 @@ with DAG(dag_id= "forex_data_pipeline",
          catchup= False,
          default_args= tasks_default_args) as dag:
     
-    is_forex_rates_available = HttpSensor (
+    is_forex_rates_available = HttpSensor(
         task_id= "is_forex_rates_available",
         http_conn_id= "forex_api",
         endpoint= "marclamberti/f45f872dea4dfd3eaa015a4a1af4b39b",
@@ -31,7 +32,7 @@ with DAG(dag_id= "forex_data_pipeline",
         timeout= 20 # After 20sec of unsuccess, the task fails
     )
 
-    is_forex_currencies_file_available = FileSensor (
+    is_forex_currencies_file_available = FileSensor(
         task_id= "is_forex_currencies_file_available",
         fs_conn_id= "forex_path",
         filepath= "forex_currencies.csv",
@@ -52,9 +53,32 @@ with DAG(dag_id= "forex_data_pipeline",
         """
     )
 
+    creating_forex_rates_table = HiveOperator(
+        task_id="creating_forex_rates_table",
+        hive_cli_conn_id="hive_conn",
+        hql="""
+            CREATE EXTERNAL TABLE IF NOT EXISTS forex_rates(
+                base STRING,
+                last_update DATE,
+                eur DOUBLE,
+                usd DOUBLE,
+                nzd DOUBLE,
+                gbp DOUBLE,
+                jpy DOUBLE,
+                cad DOUBLE
+                )
+            ROW FORMAT DELIMITED
+            FIELDS TERMINATED BY ','
+            STORED AS TEXTFILE
+        """
+    )
 
-
-
+    forex_processing = SparkSubmitOperator (
+        task_id= "forex_processing",
+        application= "/opt/airflow/dags/scripts/forex_processing.py",
+        conn_id= "spark_conn",
+        verbose= False
+    )
 
 
 
